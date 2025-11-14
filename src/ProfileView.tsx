@@ -30,6 +30,7 @@ export function ProfileView() {
         !!currentAccount?.address &&
         !!chatPackageId &&
         chatPackageId !== "0xTODO",
+      refetchInterval: 5000, // Auto-refresh every 5 seconds
     }
   );
 
@@ -47,11 +48,7 @@ export function ProfileView() {
 
   const profileObj = profileData?.data?.[0];
   if (!profileObj?.data || profileObj.data.content?.dataType !== "moveObject") {
-    return (
-      <Card style={{ padding: "1rem" }}>
-        <Text>You don't have a profile yet. Create one to get started!</Text>
-      </Card>
-    );
+    return null; // Không hiển thị gì nếu chưa có profile
   }
 
   const fields = profileObj.data.content.fields as {

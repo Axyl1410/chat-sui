@@ -15,13 +15,10 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Sidebar,
   SidebarContent,
@@ -79,7 +76,7 @@ const RootLayout = () => {
                       <MessageSquare className="size-5" />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-semibold">Chat App</span>
+                      <span className="font-semibold">Sui Mess</span>
                       <span className="text-muted-foreground text-xs">
                         Decentralized Chat
                       </span>
@@ -128,9 +125,9 @@ const RootLayout = () => {
             {activeAccount ? (
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <SidebarMenuButton className="w-full" size="lg">
+                  <Popover>
+                    <SidebarMenuButton asChild size="lg">
+                      <PopoverTrigger>
                         <Avatar className="h-8 w-8 shrink-0 rounded-lg">
                           <AvatarFallback className="rounded-lg">
                             {getInitials(activeAccount.address)}
@@ -146,61 +143,70 @@ const RootLayout = () => {
                           </span>
                         </div>
                         <ChevronsUpDown className="ml-auto size-4 shrink-0" />
-                      </SidebarMenuButton>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-sm">
-                      <DialogHeader>
-                        <DialogTitle>Account details</DialogTitle>
-                        <DialogDescription>
-                          Review your connected wallet information.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 shrink-0 rounded-lg">
-                            <AvatarFallback className="rounded-lg">
-                              {getInitials(activeAccount.address)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate font-medium text-base">
-                              {displayName}
+                      </PopoverTrigger>
+                    </SidebarMenuButton>
+                    <PopoverContent
+                      align="start"
+                      className="w-80 rounded-xl border-2 p-0 shadow-2xl"
+                      side="right"
+                      sideOffset={12}
+                    >
+                      <div className="p-4">
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-base">
+                            Account details
+                          </h3>
+                          <p className="text-muted-foreground text-xs">
+                            Review your connected wallet information.
+                          </p>
+                        </div>
+                        <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 shrink-0 rounded-lg">
+                              <AvatarFallback className="rounded-lg">
+                                {getInitials(activeAccount.address)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-medium text-base">
+                                {displayName}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 rounded-md bg-background px-3 py-2">
+                            <p className="min-w-0 flex-1 break-all font-mono text-muted-foreground text-xs">
+                              {activeAccount.address}
                             </p>
+                            <Button
+                              className="h-7 shrink-0"
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(
+                                    activeAccount.address
+                                  );
+                                  toast.success("Address copied to clipboard");
+                                } catch {
+                                  toast.error("Failed to copy address");
+                                }
+                              }}
+                              size="icon-sm"
+                              variant="ghost"
+                            >
+                              <Copy className="size-3.5" />
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 rounded-md bg-background px-3 py-2">
-                          <p className="min-w-0 flex-1 break-all font-mono text-muted-foreground text-xs">
-                            {activeAccount.address}
+                        <div className="mt-4 space-y-2">
+                          <p className="text-muted-foreground text-xs">
+                            Switch or disconnect your wallet
                           </p>
-                          <Button
-                            className="h-7 shrink-0"
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(
-                                  activeAccount.address
-                                );
-                                toast.success("Address copied to clipboard");
-                              } catch {
-                                toast.error("Failed to copy address");
-                              }
-                            }}
-                            size="icon-sm"
-                            variant="ghost"
-                          >
-                            <Copy className="size-3.5" />
-                          </Button>
+                          <div className="overflow-hidden rounded-lg border bg-background">
+                            <ConnectButton />
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-4 space-y-2">
-                        <p className="text-muted-foreground text-xs">
-                          Switch or disconnect your wallet
-                        </p>
-                        <div className="overflow-hidden rounded-lg border bg-background">
-                          <ConnectButton />
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                    </PopoverContent>
+                  </Popover>
                 </SidebarMenuItem>
               </SidebarMenu>
             ) : (
@@ -242,7 +248,7 @@ const RootLayout = () => {
         </SidebarInset>
       </div>
       <Toaster position="bottom-right" />
-      <TanStackRouterDevtools />
+      {import.meta.env.DEV && <TanStackRouterDevtools position="bottom-left" />}
     </SidebarProvider>
   );
 };

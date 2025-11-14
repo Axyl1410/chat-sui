@@ -6,7 +6,7 @@ import {
 import type { SuiEvent, SuiObjectResponse } from "@mysten/sui/client";
 import { Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNetworkVariable } from "./networkConfig";
 
 interface MessageListProps {
@@ -19,6 +19,7 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
   const suiClient = useSuiClient();
   const currentAccount = useCurrentAccount();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [usernames, setUsernames] = useState<Record<string, string>>({});
 
   // Query MessageSent events để lấy danh sách message IDs
   const {
@@ -92,6 +93,55 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagesData]);
 
+  // Fetch usernames for all message authors
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      if (!(messagesData?.data && chatPackageId) || chatPackageId === "0xTODO")
+        return;
+
+      const authors = new Set<string>();
+      messagesData.data.forEach((msgObj: SuiObjectResponse) => {
+        const msgData = msgObj.data;
+        if (msgData && msgData.content?.dataType === "moveObject") {
+          const fields = msgData.content.fields as { author: string };
+          authors.add(fields.author);
+        }
+      });
+
+      const usernameMap: Record<string, string> = {};
+
+      for (const author of authors) {
+        try {
+          const profileResponse = await suiClient.getOwnedObjects({
+            owner: author,
+            filter: {
+              StructType: `${chatPackageId}::chat::UserProfile`,
+            },
+            options: {
+              showContent: true,
+            },
+          });
+
+          const profileObj = profileResponse.data?.[0];
+          if (profileObj?.data?.content?.dataType === "moveObject") {
+            const fields = profileObj.data.content.fields as {
+              username: string;
+            };
+            usernameMap[author] = fields.username;
+          } else {
+            usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
+          }
+        } catch {
+          usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
+        }
+      }
+
+      setUsernames(usernameMap);
+    };
+
+    fetchUsernames();
+  }, [messagesData, chatPackageId, suiClient]);
+
   if (isPending) {
     return <Text>Loading messages...</Text>;
   }
@@ -148,6 +198,9 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
 
         const isOwnMessage = fields.author === currentAccount?.address;
         const timestamp = new Date(Number(fields.created_at)).toLocaleString();
+        const displayName =
+          usernames[fields.author] ||
+          `${fields.author.slice(0, 6)}...${fields.author.slice(-4)}`;
 
         return (
           <Card
@@ -163,7 +216,7 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
           >
             <Flex direction="column" gap="1">
               <Text color="gray" size="1">
-                {fields.author.slice(0, 8)}... • {timestamp}
+                <strong>{displayName}</strong> • {timestamp}
               </Text>
               <Text>{fields.content}</Text>
             </Flex>
