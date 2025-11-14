@@ -96,7 +96,10 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
   // Fetch usernames for all message authors
   useEffect(() => {
     const fetchUsernames = async () => {
-      if (!(messagesData?.data && chatPackageId) || chatPackageId === "0xTODO") {
+      if (
+        !(messagesData?.data && chatPackageId) ||
+        chatPackageId === "0xTODO"
+      ) {
         return;
       }
 
@@ -132,7 +135,8 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
               };
               usernameMap[author] = fields.username;
             } else {
-              usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
+              usernameMap[author] =
+                `${author.slice(0, 6)}...${author.slice(-4)}`;
             }
           } catch {
             usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
