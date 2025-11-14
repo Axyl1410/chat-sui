@@ -71,10 +71,12 @@ export function CreateProfile({
 
           // Tìm profile ID từ created objects
           const profileId = effects?.created?.[0]?.reference?.objectId;
-          if (profileId && onCreated) {
-            onCreated(profileId);
-          }
           setUsername("");
+
+          // Luôn gọi callback để refresh UI
+          if (onCreated) {
+            onCreated(profileId || "");
+          }
         },
         onError: (err) => {
           setError(err.message || "Failed to create profile");
