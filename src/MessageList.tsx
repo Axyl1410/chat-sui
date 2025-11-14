@@ -96,45 +96,53 @@ export function MessageList({ roomId, refreshTrigger }: MessageListProps) {
   // Fetch usernames for all message authors
   useEffect(() => {
     const fetchUsernames = async () => {
-      if (!(messagesData?.data && chatPackageId) || chatPackageId === "0xTODO")
+      if (
+        !(messagesData?.data && chatPackageId) ||
+        chatPackageId === "0xTODO"
+      ) {
         return;
+      }
 
       const authors = new Set<string>();
-      messagesData.data.forEach((msgObj: SuiObjectResponse) => {
+      for (const msgObj of messagesData.data) {
         const msgData = msgObj.data;
         if (msgData && msgData.content?.dataType === "moveObject") {
           const fields = msgData.content.fields as { author: string };
           authors.add(fields.author);
         }
-      });
+      }
 
       const usernameMap: Record<string, string> = {};
 
-      for (const author of authors) {
-        try {
-          const profileResponse = await suiClient.getOwnedObjects({
-            owner: author,
-            filter: {
-              StructType: `${chatPackageId}::chat::UserProfile`,
-            },
-            options: {
-              showContent: true,
-            },
-          });
+      // Fetch all profiles concurrently
+      await Promise.all(
+        Array.from(authors).map(async (author) => {
+          try {
+            const profileResponse = await suiClient.getOwnedObjects({
+              owner: author,
+              filter: {
+                StructType: `${chatPackageId}::chat::UserProfile`,
+              },
+              options: {
+                showContent: true,
+              },
+            });
 
-          const profileObj = profileResponse.data?.[0];
-          if (profileObj?.data?.content?.dataType === "moveObject") {
-            const fields = profileObj.data.content.fields as {
-              username: string;
-            };
-            usernameMap[author] = fields.username;
-          } else {
+            const profileObj = profileResponse.data?.[0];
+            if (profileObj?.data?.content?.dataType === "moveObject") {
+              const fields = profileObj.data.content.fields as {
+                username: string;
+              };
+              usernameMap[author] = fields.username;
+            } else {
+              usernameMap[author] =
+                `${author.slice(0, 6)}...${author.slice(-4)}`;
+            }
+          } catch {
             usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
           }
-        } catch {
-          usernameMap[author] = `${author.slice(0, 6)}...${author.slice(-4)}`;
-        }
-      }
+        })
+      );
 
       setUsernames(usernameMap);
     };

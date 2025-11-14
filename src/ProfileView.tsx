@@ -48,7 +48,7 @@ export function ProfileView() {
 
   const profileObj = profileData?.data?.[0];
   if (!profileObj?.data || profileObj.data.content?.dataType !== "moveObject") {
-    return null; // Không hiển thị gì nếu chưa có profile
+    return null; // Don't display anything if no profile exists
   }
 
   const fields = profileObj.data.content.fields as {
