@@ -1,15 +1,11 @@
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 import { Card, Flex, Heading, Text } from "@radix-ui/themes";
-import { useProfileRegistry } from "./hooks/useChatRegistry";
 import { useNetworkVariable } from "./networkConfig";
 import { UpdateUsername } from "./UpdateUsername";
 
 export function ProfileView() {
   const chatPackageId = useNetworkVariable("chatPackageId");
   const currentAccount = useCurrentAccount();
-  const { data: profileRegistryData } = useProfileRegistry();
-
-  const profileRegistryId = profileRegistryData?.data?.[0]?.data?.objectId;
 
   // Query user's profile
   const {

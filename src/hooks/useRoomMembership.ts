@@ -1,4 +1,5 @@
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import type { SuiEvent } from "@mysten/sui/client";
 import { useNetworkVariable } from "../networkConfig";
 
 export function useRoomMembership(roomId: string) {
@@ -46,18 +47,20 @@ export function useRoomMembership(roomId: string) {
 
   // Đếm số lần join và leave
   const joinCount =
-    joinEvents.data?.filter(
-      (event) =>
-        event.parsedJson?.room_id === roomId &&
-        event.parsedJson?.user === currentAccount.address
-    ).length || 0;
+    joinEvents.data?.filter((event: SuiEvent) => {
+      const parsed = event.parsedJson as { room_id: string; user: string };
+      return (
+        parsed.room_id === roomId && parsed.user === currentAccount.address
+      );
+    }).length || 0;
 
   const leaveCount =
-    leaveEvents.data?.filter(
-      (event) =>
-        event.parsedJson?.room_id === roomId &&
-        event.parsedJson?.user === currentAccount.address
-    ).length || 0;
+    leaveEvents.data?.filter((event: SuiEvent) => {
+      const parsed = event.parsedJson as { room_id: string; user: string };
+      return (
+        parsed.room_id === roomId && parsed.user === currentAccount.address
+      );
+    }).length || 0;
 
   // Nếu số lần join > số lần leave thì user đang là member
   return joinCount > leaveCount;
