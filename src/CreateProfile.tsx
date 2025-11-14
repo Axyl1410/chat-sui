@@ -74,8 +74,8 @@ export function CreateProfile({
           setUsername("");
 
           // Luôn gọi callback để refresh UI
-          if (onCreated) {
-            onCreated(profileId || "");
+          if (onCreated && profileId) {
+            onCreated(profileId);
           }
         },
         onError: (err) => {
