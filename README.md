@@ -60,22 +60,73 @@ sui client publish --gas-budget 100000000 counter
 ```
 
 In the output there will be an object with a `"packageId"` property. You'll want
-to save that package ID to the `src/constants.ts` file as `PACKAGE_ID`:
+to save that package ID.
+
+### Cách 1: Sử dụng Environment Variables (Khuyến nghị)
+
+1. Copy file `.env.example` thành `.env`:
+```bash
+cp .env.example .env
+```
+
+2. Mở file `.env` và điền package ID của bạn:
+```env
+VITE_TESTNET_CHAT_PACKAGE_ID=0xYOUR_PACKAGE_ID_HERE
+```
+
+### Cách 2: Sửa trực tiếp trong `src/constants.ts`
 
 ```ts
-export const TESTNET_COUNTER_PACKAGE_ID = "<YOUR_PACKAGE_ID>";
+export const TESTNET_CHAT_PACKAGE_ID = "0xYOUR_PACKAGE_ID_HERE";
 ```
+
+**Lưu ý**: Nếu bạn set cả env variable và hardcode, env variable sẽ được ưu tiên.
+
+### Deploy Chat Contract
+
+Để deploy chat contract:
+
+```bash
+cd move/chat
+sui client publish --gas-budget 100000000 .
+```
+
+Sau khi deploy, copy package ID và điền vào `.env` hoặc `constants.ts`.
 
 Now that we have published the move code, and update the package ID, we can
 start the app.
 
 ## Starting your dApp
 
-To install dependencies you can run
+### 1. Cài đặt dependencies
 
 ```bash
 pnpm install
 ```
+
+### 2. Cấu hình Environment Variables
+
+Tạo file `.env` từ `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Mở file `.env` và điền các package IDs sau khi deploy contract:
+
+```env
+# Chat Package IDs (bắt buộc cho chat app)
+VITE_TESTNET_CHAT_PACKAGE_ID=0xYOUR_CHAT_PACKAGE_ID
+
+# Counter Package IDs (optional - chỉ cần nếu dùng counter demo)
+VITE_TESTNET_COUNTER_PACKAGE_ID=0xYOUR_COUNTER_PACKAGE_ID
+```
+
+**Lưu ý**: 
+- Tất cả env variables phải có prefix `VITE_` để Vite có thể đọc được
+- File `.env` đã được thêm vào `.gitignore` nên sẽ không bị commit lên git
+
+### 3. Chạy dApp
 
 To start your dApp in development mode run
 

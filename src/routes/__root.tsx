@@ -10,12 +10,7 @@ import {
   useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import {
-  ChevronsUpDown,
-  Copy,
-  Home,
-  Search,
-} from "lucide-react";
+import { ChevronsUpDown, Copy, Home, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,7 +22,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -82,12 +76,12 @@ const RootLayout = () => {
                 <SidebarMenuButton asChild size="lg">
                   <Link to="/">
                     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                      <span className="font-semibold text-sm lowercase">S</span>
+                      <MessageSquare className="size-5" />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-semibold">Sui DApp</span>
+                      <span className="font-semibold">Chat App</span>
                       <span className="text-muted-foreground text-xs">
-                        Decentralized Application
+                        Decentralized Chat
                       </span>
                     </div>
                   </Link>
@@ -104,24 +98,27 @@ const RootLayout = () => {
                     <SidebarMenuButton
                       asChild
                       isActive={isActive("/")}
-                      tooltip="Home"
+                      tooltip="Chat"
                     >
                       <Link to="/">
-                        <Home className="size-5" />
-                        <span>Home</span>
+                        <MessageSquare className="size-5" />
+                        <span>Chat</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="Search">
-                      <Link to="/">
-                        <Search className="size-5" />
-                        <span>Search</span>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive("/counter")}
+                      tooltip="Counter"
+                    >
+                      <Link to="/counter">
+                        <Home className="size-5" />
+                        <span>Counter</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -231,15 +228,14 @@ const RootLayout = () => {
             {/* Right Sidebar */}
             <aside className="hidden w-80 border-border border-l lg:block">
               <div className="sticky top-0 space-y-4 p-4">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground" />
-                  <Input
-                    className="h-10 rounded-full bg-muted pl-10"
-                    placeholder="Search"
-                  />
+                <div className="rounded-lg border bg-muted/20 p-4">
+                  <h3 className="mb-2 font-semibold">Quick Actions</h3>
+                  <div className="space-y-2 text-muted-foreground text-sm">
+                    <p>• Create your profile to start chatting</p>
+                    <p>• Join or create rooms</p>
+                    <p>• Send messages in rooms</p>
+                  </div>
                 </div>
-
               </div>
             </aside>
           </main>
