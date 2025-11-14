@@ -76,7 +76,7 @@ const RootLayout = () => {
                       <MessageSquare className="size-5" />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-semibold">Chat App</span>
+                      <span className="font-semibold">Sui Mess</span>
                       <span className="text-muted-foreground text-xs">
                         Decentralized Chat
                       </span>

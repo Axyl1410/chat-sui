@@ -57,7 +57,7 @@ export function ChatApp() {
   return (
     <Container size="4">
       <Flex direction="column" gap="4" style={{ padding: "2rem" }}>
-        <Heading size="8">Chat Application</Heading>
+        <Heading size="8">Sui Messenger</Heading>
 
         <Tabs.Root onValueChange={setActiveTab} value={activeTab}>
           <Tabs.List>
